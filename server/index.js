@@ -13,7 +13,10 @@ app.use(express.urlencoded({extended: false}));
 app.get('/', async function (req, res) {
     try {
         const connection = await mysql.createConnection(config.db);
-        res.status(200).send('Database connection successful');
+        const [result] = await connection.execute('select * from task');
+
+        if (!result) result=[];
+        res.status(200).json(result);
     } catch (err) {
         res.status(500).send(err.message);
     }
