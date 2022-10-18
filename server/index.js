@@ -22,4 +22,15 @@ app.get('/', async function (req, res) {
     }
 })
 
+app.post('/new', async function (req,res) {
+    try {
+        const connection = await mysql.createConnection(config.db);
+        const [result] = await connection.execute('insert into task (description) values (?)', [req.body.description]);
+
+        res.status(200).json({id:result.insertId})
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+})
+
 app.listen(PORT);
