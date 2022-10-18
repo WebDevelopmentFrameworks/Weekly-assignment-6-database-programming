@@ -8,7 +8,6 @@
 
 # testing
 /coverage
-/server/client.rest
 
 # production
 /build
