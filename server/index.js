@@ -33,4 +33,15 @@ app.post('/new', async function (req,res) {
     }
 })
 
+app.delete('/delete/:id', async function (req,res) {
+    try {
+        const connection = await mysql.createConnection(config.db);
+        await connection.execute('delete from task where id = ?', [req.params.id]);
+
+        res.status(200).json({id:req.params.id})
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+})
+
 app.listen(PORT);
