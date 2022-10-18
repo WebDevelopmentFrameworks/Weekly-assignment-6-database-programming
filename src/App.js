@@ -6,6 +6,7 @@ const URL = 'http://localhost:3001/';
 
 function App() {
   const [tasks, setTasks] = useState([]);
+  const [task, setTask] = useState('');
 
   useEffect(() => {
     axios.get(URL)
@@ -16,9 +17,31 @@ function App() {
       })
   }, [])
 
+  function save() {
+    const json = JSON.stringify({description: task});
+    axios.post(URL + 'new', json, {
+      headers: {
+        'Content-Type':'application/json'
+      }
+    })
+    .then((response) => {
+      const addedObject = JSON.parse(json);
+      addedObject.id = response.data.id;
+      setTasks(tasks => [...tasks, addedObject]);
+      setTask('');
+    }).catch(error => {
+      alert(error.response.data.error);
+    })
+  }
+
   return (
     <div>
       <h3>My tasks:</h3>
+      <form>
+        <label>Add new</label>
+        <input value={task} onChange={e => setTask(e.target.value)}/>
+        <button type='button' onClick={save}>Save</button>
+      </form>
       <ol>
         {tasks.map(task => (
           <li key={task.id}>{task.description}</li>
