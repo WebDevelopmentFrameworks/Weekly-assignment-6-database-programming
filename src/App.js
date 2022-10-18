@@ -34,6 +34,16 @@ function App() {
     })
   }
 
+  function remove(id) {
+    axios.delete(`${URL}delete/${id}`)
+    .then(() => {
+      const newList = tasks.filter((item) => item.id !== id);
+      setTasks(newList);
+    }).catch(error => {
+      alert(error.response.data.error);
+    })
+  }
+
   return (
     <div>
       <h3>My tasks:</h3>
@@ -44,7 +54,7 @@ function App() {
       </form>
       <ol>
         {tasks.map(task => (
-          <li key={task.id}>{task.description}</li>
+          <li key={task.id}>{task.description} <a href='#' onClick={() => remove(task.id)}>Delete</a></li>
         ))}
       </ol>
     </div>
