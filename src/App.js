@@ -7,6 +7,8 @@ const URL = 'http://localhost:3001/';
 function App() {
   const [tasks, setTasks] = useState([]);
   const [task, setTask] = useState('');
+  const [editTask, setEditTask] = useState(null);
+  const [editDescription, setEditDescription] = useState('');
 
   useEffect(() => {
     axios.get(URL)
@@ -44,6 +46,33 @@ function App() {
     })
   }
 
+  function setEditableRow(task) {
+    setEditTask(task);
+    setEditDescription(task.description);
+  }
+
+  function edit() {
+    const json = JSON.stringify({id: editTask.id, description: editDescription});
+    axios.put(URL + 'edit', json, {
+      headers: {
+        'Content-Type':'application/json'
+      }
+    })
+    .then(() => {
+      const tempArray = [...tasks];
+      const index = tempArray.findIndex(task => {return task.id === editTask.id});
+
+      if(index !== -1) tempArray[index].description = editDescription;
+
+      setTasks(tempArray);
+      setEditTask(null);
+      setEditDescription('');
+    })
+    .catch(error => {
+      alert(error.response.data.error);
+    })
+  }
+
   return (
     <div>
       <h3>My tasks:</h3>
@@ -54,7 +83,22 @@ function App() {
       </form>
       <ol>
         {tasks.map(task => (
-          <li key={task.id}>{task.description} <a href='#' onClick={() => remove(task.id)}>Delete</a></li>
+          <li key={task.id}>
+            {editTask?.id !== task.id &&
+              task.description + ' '
+            }
+            {editTask?.id === task.id &&
+              <form>
+                <input value={editDescription} onChange={e => setEditDescription(e.target.value)}/>
+                <button type='button' onClick={edit}>Save</button>
+                <button type='button' onClick={() => setEditTask(null)}>Cancel</button>
+              </form>
+            }
+            <a href='#' onClick={() => remove(task.id)}>Delete </a>
+            {editTask === null &&
+              <a href='#' onClick={() => setEditableRow(task)}> Edit</a>
+            }
+          </li>
         ))}
       </ol>
     </div>
